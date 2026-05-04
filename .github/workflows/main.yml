@@ -15,6 +15,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Use the Secret
+        # This creates an Environment Variable inside the runner
+        env:
+          DB_PASS: ${{ secrets.MY_DATABASE_PASSWORD }}
+        run: |
+          echo "The workflow is now using the secret."
+          # Note: If you try to 'echo' the secret, GitHub will automatically mask it with ***
+          echo "My password is $DB_PASS."
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
