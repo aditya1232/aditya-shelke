@@ -12,14 +12,16 @@ jobs:
 
     # 3. THE STEPS: The sequence of tasks
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v4 # This is a pre-made Action that copies your code to the server
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Run a one-line script
-        run: echo "Hello, GitHub Actions is running!"
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Specify your version
 
-      - name: Run a multi-line script
-        run: |
-          echo "Current directory:"
-          pwd
-          ls -la
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
