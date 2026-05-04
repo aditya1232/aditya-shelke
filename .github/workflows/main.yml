@@ -6,7 +6,7 @@ on: [push]
 
 # 2. THE JOBS: What should happen?
 jobs:
-  build-and-greet:
+  secret-check:
     # This tells GitHub to run the code on a fresh Ubuntu Linux server
     runs-on: ubuntu-latest
 
