@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
-    "db:seed": "node src/config/seed.js"
+    "db:seed": "node src/config/seed.js",
+    "test": "echo 'No tests yet!'"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
