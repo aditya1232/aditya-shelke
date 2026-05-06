@@ -16,5 +16,4 @@ RUN ls -la /app
 
 EXPOSE 3000
 
-# CMD ["node", "app.js"]
-CMD ["pm2-runtime", "npm", "--", "run", "dev"]
+CMD ["node", "app.js"]
