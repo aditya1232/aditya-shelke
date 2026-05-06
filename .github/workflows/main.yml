@@ -1,36 +1,85 @@
-# The name of the workflow as it appears in the GitHub Actions tab
-name: My First Action
+# # The name of the workflow as it appears in the GitHub Actions tab
+# name: My First Action
 
-# 1. THE EVENT: What triggers this?
-on: [push]
+# # 1. THE EVENT: What triggers this?
+# on: [push]
 
-# 2. THE JOBS: What should happen?
+# # 2. THE JOBS: What should happen?
+# jobs:
+#   secret-check:
+#     # This tells GitHub to run the code on a fresh Ubuntu Linux server
+#     runs-on: ubuntu-latest
+
+#     # 3. THE STEPS: The sequence of tasks
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+
+#       - name: Use the Secret
+#         # This creates an Environment Variable inside the runner
+#         env:
+#           DB_PASS: ${{ secrets.MY_DATABASE_PASSWORD }}
+#         run: |
+#           echo "The workflow is now using the secret."
+#           # Note: If you try to 'echo' the secret, GitHub will automatically mask it with ***
+#           echo "My password is $DB_PASS."
+
+#       - name: Set up Node.js
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: '20' # Specify your version
+
+#       - name: Install dependencies
+#         run: npm install
+
+#       - name: Run tests
+#         run: npm test
+
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
 jobs:
-  secret-check:
-    # This tells GitHub to run the code on a fresh Ubuntu Linux server
+  test:
     runs-on: ubuntu-latest
-
-    # 3. THE STEPS: The sequence of tasks
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Use the Secret
-        # This creates an Environment Variable inside the runner
-        env:
-          DB_PASS: ${{ secrets.MY_DATABASE_PASSWORD }}
-        run: |
-          echo "The workflow is now using the secret."
-          # Note: If you try to 'echo' the secret, GitHub will automatically mask it with ***
-          echo "My password is $DB_PASS."
-
-      - name: Set up Node.js
+      - uses: actions/checkout@v4
+      - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Specify your version
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm test # This will run your basic.test.js
 
-      - name: Install dependencies
-        run: npm install
+  build-and-push:
+    needs: test # Only build if tests pass
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Run tests
-        run: npm test
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
