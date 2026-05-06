@@ -3,7 +3,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
-# This copies everything from your root (including app.js and src/)
+# This copies everything from your project root (including app.js and src/)
 COPY . . 
 
 # Stage 2: Production
@@ -11,15 +11,13 @@ FROM node:20-alpine
 WORKDIR /app
 ENV NODE_ENV=production
 
-# Copy only necessary files from the builder stage
+# 1. Copy dependencies first (best practice for caching)
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
-# IMPORTANT: This copies app.js and the src/ directory into the production image
+
+# 2. CRITICAL: Copy the main file and the source folder explicitly
 COPY --from=builder /app/app.js ./app.js
 COPY --from=builder /app/src ./src
 
-# Expose the port your app uses
-EXPOSE 30001
-
-# Start the application
+EXPOSE 3000
 CMD ["node", "app.js"]
