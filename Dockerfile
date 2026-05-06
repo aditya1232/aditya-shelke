@@ -26,4 +26,4 @@ USER node
 EXPOSE 3000
 
 # Start the application
-CMD ["node", "src/app.js"]
+CMD ["node", "app.js"]
