@@ -56,7 +56,7 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm test # This will run your basic.test.js
-
+  
   build-and-push:
     needs: test # Only build if tests pass
     runs-on: ubuntu-latest
@@ -74,7 +74,10 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
+      - name: Check file location
+        run: |
+          pwd
+          ls -R
       - name: Build and Push
         uses: docker/build-push-action@v5
         with:
