@@ -12,8 +12,8 @@ ENV NODE_ENV=dev
 COPY . .
 
 # List files during build to verify app.js is there (Check your logs for this!)
-RUN ls -la /app
+RUN ls -la /app/src
 
 EXPOSE 3000
 
-CMD ["node", "app.js"]
+CMD ["node", "src/app.js"]
