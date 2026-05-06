@@ -5,6 +5,7 @@ WORKDIR /app
 # Copy package files first to leverage Docker cache
 COPY package*.json ./
 RUN npm ci
+RUN npm install pm2 -g
 
 # Copy the rest of your code (src, app.js, etc.)
 COPY . .
@@ -26,4 +27,5 @@ USER node
 EXPOSE 3000
 
 # Start the application
-CMD ["node", "app.js"]
+# CMD ["node", "app.js"]
+CMD ["pm2-runtime", "npm", "--", "run", "dev"]
