@@ -24,7 +24,7 @@ COPY --from=builder /app .
 # Security: Don't run as root
 USER node
 
-EXPOSE 30001
+EXPOSE 30002
 
 # Start the application
 CMD ["node", "app.js"]
