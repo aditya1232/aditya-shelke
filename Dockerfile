@@ -1,31 +1,22 @@
-# Stage 1: Build stage
+# Stage 1: Build
 FROM node:20-alpine AS builder
 WORKDIR /app
-
-# Copy package files first to leverage Docker cache
 COPY package*.json ./
 RUN npm ci
-RUN npm install pm2 -g
+COPY . . 
+# This copies EVERYTHING (including app.js) into /app in the builder stage
 
-# Copy the rest of your code (src, app.js, etc.)
-COPY . .
-
-# Stage 2: Production stage
+# Stage 2: Production
 FROM node:20-alpine
 WORKDIR /app
-ENV NODE_ENV=dev
+ENV NODE_ENV=production
 
-# Copy only necessary files from builder
+# Copy dependencies
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
-# Use '.' to copy everything (including app.js and src) from the builder's /app folder
-COPY --from=builder /app .
 
-# Security: Don't run as root
-USER node
+# CRITICAL FIX: Copy everything from the builder's /app to the production's /app
+COPY --from=builder /app ./
 
-EXPOSE 30002
-
-# Start the application
+# If your file is named 'app.js' and is in the root of your repo, this will work
 CMD ["node", "app.js"]
-# CMD ["pm2-runtime", "npm", "--", "run", "dev"]
